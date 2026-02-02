@@ -30,6 +30,7 @@ model Invoice {
   total           Float         @default(0)
   paid            Float         @default(0)
   balance         Float         @default(0)
+  paidStatus      String        @default("unpaid") // unpaid, partial, paid
   receiverName    String?
   receiverPhone   String?
   accountant      String?

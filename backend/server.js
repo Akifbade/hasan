@@ -10,6 +10,52 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'kuwait-customs-secret-key-2024';
 
+// Initialize database on startup
+async function initializeDatabase() {
+  try {
+    // Test database connection
+    await prisma.$connect();
+    console.log('Database connected successfully');
+
+    // Create default admin user if not exists
+    const adminExists = await prisma.user.findUnique({ where: { username: 'admin' } });
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      await prisma.user.create({
+        data: {
+          username: 'admin',
+          password: hashedPassword,
+          name: 'Administrator'
+        }
+      });
+      console.log('Default admin user created');
+    }
+
+    // Create default settings if not exists
+    const settingsExist = await prisma.settings.findFirst();
+    if (!settingsExist) {
+      await prisma.settings.create({
+        data: {
+          companyName: 'Muharram Rakan Al-Ajmi Customs Clearance Office',
+          companyNameAr: 'مكتب محرم راكان العجمي للتخليص الجمركي',
+          ownerName: 'Mohd. hassan Mohd. Abd. Haq',
+          ownerNameAr: 'محمد حسن محمد عبدالحق',
+          phone: '60744492',
+          lastInvoiceNumber: 1000,
+          qrBaseUrl: `http://localhost:${PORT}/verify`
+        }
+      });
+      console.log('Default settings created');
+    }
+  } catch (error) {
+    console.error('Database initialization error:', error.message);
+    // Don't exit, continue anyway - SQLite might need db push
+  }
+}
+
+// Initialize database
+initializeDatabase();
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -345,6 +391,18 @@ app.post('/api/invoices', authenticateToken, async (req, res) => {
     const paid = parseFloat(invoiceData.paid) || 0;
     const balance = total - paid;
 
+    // Calculate paidStatus if not provided
+    let paidStatus = invoiceData.paidStatus;
+    if (!paidStatus) {
+      if (balance <= 0 && total > 0) {
+        paidStatus = 'paid';
+      } else if (paid > 0) {
+        paidStatus = 'partial';
+      } else {
+        paidStatus = 'unpaid';
+      }
+    }
+
     // Convert date string to DateTime
     const date = invoiceData.date ? new Date(invoiceData.date) : new Date();
 
@@ -356,6 +414,7 @@ app.post('/api/invoices', authenticateToken, async (req, res) => {
         total,
         paid,
         balance,
+        paidStatus,
         items: {
           create: items.map((item, index) => ({
             descriptionEn: item.descriptionEn,
@@ -386,6 +445,18 @@ app.put('/api/invoices/:id', authenticateToken, async (req, res) => {
     const paid = parseFloat(invoiceData.paid) || 0;
     const balance = total - paid;
 
+    // Calculate paidStatus if not provided
+    let paidStatus = invoiceData.paidStatus;
+    if (!paidStatus) {
+      if (balance <= 0 && total > 0) {
+        paidStatus = 'paid';
+      } else if (paid > 0) {
+        paidStatus = 'partial';
+      } else {
+        paidStatus = 'unpaid';
+      }
+    }
+
     // Convert date string to DateTime
     const date = invoiceData.date ? new Date(invoiceData.date) : undefined;
 
@@ -400,6 +471,7 @@ app.put('/api/invoices/:id', authenticateToken, async (req, res) => {
         total,
         paid,
         balance,
+        paidStatus,
         items: {
           create: items.map((item, index) => ({
             descriptionEn: item.descriptionEn,

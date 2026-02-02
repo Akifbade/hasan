@@ -288,6 +288,11 @@ async function loadInvoices(page = 1) {
 
 function createInvoiceItem(inv, showActions = false) {
   const date = new Date(inv.date).toLocaleDateString();
+  const statusClass = inv.paidStatus === 'paid' ? 'style="background:var(--success);color:white;"' :
+                      inv.paidStatus === 'partial' ? 'style="background:var(--warning);color:white;"' :
+                      'style="background:var(--gray-light);"';
+  const statusText = inv.paidStatus === 'paid' ? 'Paid' : inv.paidStatus === 'partial' ? 'Partial' : 'Unpaid';
+
   return `
     <div class="invoice-item" onclick="editInvoice(${inv.id})">
       <div class="invoice-number">#${inv.invoiceNumber}</div>
@@ -298,6 +303,7 @@ function createInvoiceItem(inv, showActions = false) {
       <div class="invoice-amount">
         <strong>${inv.total.toFixed(3)} KWD</strong>
         <span>Balance: ${inv.balance.toFixed(3)}</span>
+        <span class="badge" ${statusClass}>${statusText}</span>
       </div>
       ${showActions ? `
         <div class="invoice-actions" onclick="event.stopPropagation()">
@@ -307,6 +313,13 @@ function createInvoiceItem(inv, showActions = false) {
               <circle cx="12" cy="12" r="3"/>
             </svg>
           </button>
+          ${inv.paidStatus !== 'paid' ? `
+            <button class="btn-icon" onclick="markAsPaid(${inv.id})" title="Mark as Paid" style="color:var(--success);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </button>
+          ` : ''}
           <button class="btn-icon" onclick="editInvoice(${inv.id})" title="Edit">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
@@ -360,7 +373,7 @@ async function editInvoice(id) {
   try {
     const invoice = await fetchAPI(`/invoices/${id}`);
     currentInvoice = invoice;
-    
+
     document.getElementById('invoice-id').value = invoice.id;
     document.getElementById('invoice-number').value = invoice.invoiceNumber;
     document.getElementById('invoice-date').value = invoice.date.split('T')[0];
@@ -375,14 +388,15 @@ async function editInvoice(id) {
     document.getElementById('receiver-name').value = invoice.receiverName || '';
     document.getElementById('receiver-phone').value = invoice.receiverPhone || '';
     document.getElementById('notes').value = invoice.notes || '';
-    
+    document.getElementById('paid-status').value = invoice.paidStatus || 'unpaid';
+
     // Load line items
     const lineItemsEl = document.getElementById('line-items');
     lineItemsEl.innerHTML = '';
     invoice.items.forEach(item => {
       addLineItem(item.descriptionEn, item.descriptionAr, item.amount, item.remarks);
     });
-    
+
     calculateTotal();
     document.getElementById('print-btn').style.display = 'inline-block';
     document.getElementById('page-title').textContent = `Invoice #${invoice.invoiceNumber}`;
@@ -468,7 +482,18 @@ function calculateBalance() {
   const totalText = document.getElementById('total-amount').textContent;
   const total = parseFloat(totalText) || 0;
   const paid = parseFloat(document.getElementById('paid-amount').value) || 0;
-  document.getElementById('balance-amount').value = (total - paid).toFixed(3) + ' KWD';
+  const balance = total - paid;
+  document.getElementById('balance-amount').value = balance.toFixed(3) + ' KWD';
+
+  // Auto-set paid status
+  const statusSelect = document.getElementById('paid-status');
+  if (balance <= 0 && total > 0) {
+    statusSelect.value = 'paid';
+  } else if (paid > 0) {
+    statusSelect.value = 'partial';
+  } else {
+    statusSelect.value = 'unpaid';
+  }
 }
 
 // Save Invoice
@@ -505,6 +530,7 @@ document.getElementById('invoice-form').addEventListener('submit', async (e) => 
     seaAirLand: document.getElementById('sea-air-land').value,
     description: document.getElementById('description').value,
     paid: parseFloat(document.getElementById('paid-amount').value) || 0,
+    paidStatus: document.getElementById('paid-status').value,
     receiverName: document.getElementById('receiver-name').value,
     receiverPhone: document.getElementById('receiver-phone').value,
     notes: document.getElementById('notes').value,
@@ -544,6 +570,25 @@ async function deleteInvoice(id) {
   } catch (err) {
     console.error('Delete invoice error:', err);
     alert('Failed to delete invoice');
+  }
+}
+
+async function markAsPaid(id) {
+  try {
+    const invoice = await fetchAPI(`/invoices/${id}`);
+    await fetchAPI(`/invoices/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        paid: invoice.total,
+        balance: 0,
+        paidStatus: 'paid'
+      })
+    });
+    loadInvoices(currentPage);
+    loadDashboard();
+  } catch (err) {
+    console.error('Mark as paid error:', err);
+    alert('Failed to update invoice');
   }
 }
 
