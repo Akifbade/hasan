@@ -23,7 +23,8 @@
       "Bash(git commit -m \"Initial commit - Kuwait Customs Clearance website\")",
       "Bash(git remote add origin https://github.com/Akifbade/hasan.git)",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git ls-tree:*)"
     ]
   }
 }
