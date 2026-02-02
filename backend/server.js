@@ -604,8 +604,8 @@ app.put('/api/website-content', authenticateToken, async (req, res) => {
   }
 });
 
-// Serve frontend
-app.get('*', (req, res) => {
+// Serve frontend (exclude API and verify routes)
+app.get(/^(?!\/api\/|\/verify\/).+/, (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 

@@ -393,11 +393,21 @@ async function editInvoice(id) {
     // Load line items
     const lineItemsEl = document.getElementById('line-items');
     lineItemsEl.innerHTML = '';
-    invoice.items.forEach(item => {
-      addLineItem(item.descriptionEn, item.descriptionAr, item.amount, item.remarks);
+    console.log('Invoice items:', invoice.items);
+    invoice.items.forEach((item, index) => {
+      console.log(`Loading item ${index}:`, item);
+      addLineItem(item.descriptionEn, item.descriptionAr, item.amount || 0, item.remarks || '');
     });
 
-    calculateTotal();
+    // Small delay to ensure DOM is updated before calculating
+    setTimeout(() => {
+      const amountInputs = document.querySelectorAll('.item-amount');
+      console.log('Amount inputs found:', amountInputs.length);
+      amountInputs.forEach((input, i) => {
+        console.log(`Input ${i} value:`, input.value);
+      });
+      calculateTotal();
+    }, 50);
     document.getElementById('print-btn').style.display = 'inline-block';
     document.getElementById('page-title').textContent = `Invoice #${invoice.invoiceNumber}`;
 
