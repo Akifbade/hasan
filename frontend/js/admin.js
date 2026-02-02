@@ -400,7 +400,12 @@ async function editInvoice(id) {
     calculateTotal();
     document.getElementById('print-btn').style.display = 'inline-block';
     document.getElementById('page-title').textContent = `Invoice #${invoice.invoiceNumber}`;
-    showView('create');
+
+    // Show create view without calling prepareNewInvoice (which resets the form)
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('create-view').classList.add('active');
+    document.querySelector('[data-view="create"]')?.classList.add('active');
   } catch (err) {
     console.error('Edit invoice error:', err);
     alert('Failed to load invoice');
@@ -579,6 +584,7 @@ async function markAsPaid(id) {
     await fetchAPI(`/invoices/${id}`, {
       method: 'PUT',
       body: JSON.stringify({
+        ...invoice,
         paid: invoice.total,
         balance: 0,
         paidStatus: 'paid'
