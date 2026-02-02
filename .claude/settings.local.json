@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp add:*)",
+      "Bash(where:*)",
+      "Bash(uvx:*)",
+      "Skill(glm-plan-usage:usage-query)",
+      "Skill(glm-plan-usage:usage-query:*)",
+      "Bash(npx query-usage.mjs)",
+      "Bash(node:*)",
+      "Bash(./query-usage.mjs:*)",
+      "Bash(npm start)",
+      "Bash(npm install)",
+      "mcp__MiniMax__understand_image",
+      "Bash(npx prisma:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(npm install:*)",
+      "Bash(node_modules/.bin/prisma:*)",
+      "Bash(npx sqlite3:*)",
+      "Bash(git init)",
+      "Bash(git add:*)",
+      "Bash(del:*)",
+      "Bash(git commit -m \"Initial commit - Kuwait Customs Clearance website\")"
+    ]
+  }
+}

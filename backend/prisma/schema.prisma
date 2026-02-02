@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invoice {
+  id              Int           @id @default(autoincrement())
+  invoiceNumber   String        @unique
+  date            DateTime      @default(now())
+  customerName    String
+  weight          String?
+  blAwb           String?
+  quantity        String?
+  seaAirLand      String?
+  bayanNo         String?
+  description     String?
+  total           Float         @default(0)
+  paid            Float         @default(0)
+  balance         Float         @default(0)
+  receiverName    String?
+  receiverPhone   String?
+  accountant      String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  items           InvoiceItem[]
+}
+
+model InvoiceItem {
+  id            Int      @id @default(autoincrement())
+  invoiceId     Int
+  descriptionEn String
+  descriptionAr String
+  amount        Float    @default(0)
+  remarks       String?
+  sortOrder     Int      @default(0)
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id           Int    @id @default(autoincrement())
+  companyName  String @default("Customs Clearance Office")
+  companyNameAr String @default("مكتب التخليص الجمركي")
+  ownerName    String @default("Mohd. hassan Mohd. Abd. Haq")
+  ownerNameAr  String @default("محمد حسن محمد عبدالحق")
+  phone        String @default("60744492")
+  lastInvoiceNumber Int @default(1000)
+  logoUrl      String?
+  stampUrl     String?
+  showQrCode   Boolean @default(true)
+  qrBaseUrl    String @default("http://localhost:3000/verify")
+}
+
+model ContactMessage {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String?
+  message     String
+  status      String   @default("new") // new, read, replied
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WebsiteContent {
+  id          Int      @id @default(autoincrement())
+  section     String   // hero, services, about, gallery
+  key         String   // title-en, title-ar, content, etc.
+  value       String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

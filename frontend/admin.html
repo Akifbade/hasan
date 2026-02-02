@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Kuwait Customs Clearance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-header">
+        <svg class="login-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M32 8L52 24V56H12V24L32 8Z"/>
+          <path d="M8 28L32 4L56 28"/>
+        </svg>
+        <h1>Kuwait Customs</h1>
+        <p>Admin Portal</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Login</button>
+        <p class="login-error" id="login-error"></p>
+      </form>
+      <a href="index.html" class="back-link">Back to Website</a>
+    </div>
+  </div>
+  
+  <!-- Admin Dashboard -->
+  <div id="admin-app" class="admin-app hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Kuwait Customs</h2>
+        <p class="sidebar-ar">التخليص الجمركي</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Dashboard
+        </a>
+        <a href="#" class="nav-item" data-view="invoices">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+          Invoices
+        </a>
+        <a href="#" class="nav-item" data-view="create">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
+          </svg>
+          New Invoice
+        </a>
+        <a href="#" class="nav-item" data-view="blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8"/>
+          </svg>
+          Blank Invoice
+        </a>
+        <a href="#" class="nav-item" data-view="messages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+          Messages
+        </a>
+        <a href="#" class="nav-item" data-view="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+          Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </button>
+        <h1 id="page-title">Dashboard</h1>
+        <div class="user-info">
+          <span id="user-name">Admin</span>
+        </div>
+      </header>
+      
+      <!-- Dashboard View -->
+      <div id="dashboard-view" class="view active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value" id="total-invoices">0</span>
+              <span class="stat-label">Total Invoices</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value" id="total-revenue">0.000</span>
+              <span class="stat-label">Total Revenue (KWD)</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value" id="total-balance">0.000</span>
+              <span class="stat-label">Outstanding (KWD)</span>
+            </div>
+          </div>
+        </div>
+        <div class="recent-section">
+          <h3>Recent Invoices</h3>
+          <div id="recent-invoices" class="invoice-list"></div>
+        </div>
+      </div>
+      
+      <!-- Invoices View -->
+      <div id="invoices-view" class="view">
+        <div class="view-header">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search invoices...">
+          </div>
+          <button class="btn btn-primary" onclick="showView('create')">New Invoice</button>
+        </div>
+        <div id="invoices-list" class="invoice-list"></div>
+        <div id="pagination" class="pagination"></div>
+      </div>
+      
+      <!-- Create/Edit Invoice View -->
+      <div id="create-view" class="view">
+        <form id="invoice-form" class="invoice-form">
+          <input type="hidden" id="invoice-id">
+
+          <div class="form-section">
+            <h3>Invoice Details</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Invoice Number</label>
+                <input type="text" id="invoice-number" readonly>
+              </div>
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="invoice-date" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Customer Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Mr. / Mrs.</label>
+                <input type="text" id="customer-name" required placeholder="Customer Name">
+              </div>
+              <div class="form-group">
+                <label>Bayan No.</label>
+                <input type="text" id="bayan-no" placeholder="Bayan Number">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Weight</label>
+                <input type="text" id="weight" placeholder="e.g., 1000 KG">
+              </div>
+              <div class="form-group">
+                <label>BL/AWD</label>
+                <input type="text" id="bl-awb" placeholder="BL/AWD Number">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Quantity</label>
+                <input type="text" id="quantity" placeholder="e.g., 10 Pallets">
+              </div>
+              <div class="form-group">
+                <label>Sea/Air/Land</label>
+                <select id="sea-air-land">
+                  <option value="">Select Type</option>
+                  <option value="Sea">Sea</option>
+                  <option value="Air">Air</option>
+                  <option value="Land">Land</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group full-width">
+              <label>Description</label>
+              <input type="text" id="description" placeholder="Shipment description">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Service Line Items</h3>
+            <div class="line-items-header">
+              <span class="col-remarks">Remarks</span>
+              <span class="col-desc">Description</span>
+              <span class="col-amount">K.D. Fils</span>
+              <span class="col-action"></span>
+            </div>
+            <div id="line-items" class="line-items"></div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="addLineItem()">+ Add Line Item</button>
+          </div>
+
+          <div class="form-section">
+            <h3>Payment Summary</h3>
+            <div class="summary-row">
+              <span>Total:</span>
+              <span id="total-amount">0.000 KWD</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Paid Amount (KWD)</label>
+                <input type="number" id="paid-amount" step="0.001" value="0" onchange="calculateBalance()">
+              </div>
+              <div class="form-group">
+                <label>Balance</label>
+                <input type="text" id="balance-amount" readonly value="0.000 KWD">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Additional Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Receiver Name</label>
+                <input type="text" id="receiver-name" placeholder="Receiver Name">
+              </div>
+              <div class="form-group">
+                <label>Receiver Phone</label>
+                <input type="text" id="receiver-phone" placeholder="Phone Number">
+              </div>
+            </div>
+            <div class="form-group full-width">
+              <label>Notes</label>
+              <textarea id="notes" rows="2" placeholder="Additional notes"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="resetForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Invoice</button>
+            <button type="button" class="btn btn-secondary" id="print-btn" style="display:none" onclick="printInvoice()">Print Invoice</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Blank Invoice View -->
+      <div id="blank-view" class="view">
+        <div class="form-section">
+          <h3>Print Blank Invoice Template</h3>
+          <p class="form-description">Print a blank invoice template for manual entry by customers.</p>
+          <div class="form-actions" style="justify-content: flex-start;">
+            <button type="button" class="btn btn-primary" onclick="printBlankInvoice()">Print Blank Invoice</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages View -->
+      <div id="messages-view" class="view">
+        <div class="view-header">
+          <h3>Contact Messages</h3>
+        </div>
+        <div id="messages-list" class="invoice-list"></div>
+      </div>
+
+      <!-- Settings View -->
+      <div id="settings-view" class="view">
+        <form id="settings-form" class="invoice-form">
+          <div class="form-section">
+            <h3>Company Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Company Name (English)</label>
+                <input type="text" id="company-name" placeholder="Company Name EN">
+              </div>
+              <div class="form-group">
+                <label>Company Name (Arabic)</label>
+                <input type="text" id="company-name-ar" placeholder="Company Name AR">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Owner Name (English)</label>
+                <input type="text" id="owner-name" placeholder="Owner Name EN">
+              </div>
+              <div class="form-group">
+                <label>Owner Name (Arabic)</label>
+                <input type="text" id="owner-name-ar" placeholder="Owner Name AR">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="text" id="settings-phone" placeholder="Phone Number">
+              </div>
+              <div class="form-group">
+                <label>Last Invoice Number</label>
+                <input type="number" id="last-invoice-number" placeholder="1000">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Invoice Customization</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Logo</label>
+                <div class="file-upload">
+                  <input type="file" id="logo-upload" accept="image/*" onchange="uploadFile(this, 'logo-preview')">
+                  <div id="logo-preview" class="image-preview"></div>
+                </div>
+                <input type="hidden" id="logo-url">
+              </div>
+              <div class="form-group">
+                <label>Stamp Image</label>
+                <div class="file-upload">
+                  <input type="file" id="stamp-upload" accept="image/*" onchange="uploadFile(this, 'stamp-preview')">
+                  <div id="stamp-preview" class="image-preview"></div>
+                </div>
+                <input type="hidden" id="stamp-url">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" id="show-qr-code">
+                  Show QR Code on Invoice
+                </label>
+              </div>
+              <div class="form-group">
+                <label>QR Verification URL Base</label>
+                <input type="url" id="qr-base-url" placeholder="http://localhost:3000/verify">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="previewInvoiceFromSettings()">Preview Invoice</button>
+            <button type="button" class="btn btn-outline" onclick="loadSettings()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Print Preview -->
+      <div id="print-preview" class="print-preview hidden"></div>
+    </main>
+  </div>
+  
+  <script src="js/admin.js"></script>
+</body>
+</html>
