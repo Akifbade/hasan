@@ -29,7 +29,7 @@ function LoginForm() {
     }
 
     if (data.user) {
-      // Redirect to /admin; layout will re-route surveyors to /surveyor
+      router.refresh()
       router.push(redirect)
     }
     setLoading(false)
@@ -48,7 +48,10 @@ function LoginForm() {
       setLoading(false)
       return
     }
-    if (data.user) router.push(redirect)
+    if (data.user) {
+      router.refresh()
+      router.push(redirect)
+    }
     setLoading(false)
   }
 
