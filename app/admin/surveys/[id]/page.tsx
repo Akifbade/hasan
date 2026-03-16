@@ -75,6 +75,12 @@ export default async function SurveyDetailPage({ params }: { params: Promise<{ i
             </a>
           )}
           <Link
+            href={`/admin/surveys/${id}/chat`}
+            className="bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+          >
+            💬 Chat
+          </Link>
+          <Link
             href={`/admin/surveys/${id}/pdf`}
             className="bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium px-4 py-2 rounded-xl transition-colors"
           >
