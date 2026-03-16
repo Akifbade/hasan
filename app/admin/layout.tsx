@@ -10,13 +10,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   // Use admin client to bypass RLS for profile read (avoids policy infinite recursion)
   const admin = createAdminClient()
-  const { data: profile } = await admin
+  const { data: profile, error: profileError } = await admin
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
-  if (!profile) {
+  if (profileError || !profile) {
+    console.error('Admin layout profile error:', profileError?.message, 'userId:', user.id)
     redirect('/login')
   }
 
