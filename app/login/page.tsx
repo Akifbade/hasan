@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { loginAction } from './actions'
 import Link from 'next/link'
 
 function LoginForm() {
@@ -11,45 +11,29 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/admin'
+  const redirectTo = searchParams.get('redirect') || '/admin'
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const supabase = createClient()
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (authError) {
-      setError(authError.message)
+    const result = await loginAction(email, password, redirectTo)
+    if (result?.error) {
+      setError(result.error)
       setLoading(false)
-      return
     }
-
-    if (data.user) {
-      window.location.href = redirect
-    }
-    setLoading(false)
   }
 
   async function handleDemoLogin(demoEmail: string) {
     setLoading(true)
     setError('')
-    const supabase = createClient()
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: demoEmail,
-      password: 'demo1234',
-    })
-    if (authError) {
-      setError(authError.message)
+
+    const result = await loginAction(demoEmail, 'demo1234', redirectTo)
+    if (result?.error) {
+      setError(result.error)
       setLoading(false)
-      return
     }
-    if (data.user) {
-      window.location.href = redirect
-    }
-    setLoading(false)
   }
 
   return (
