@@ -4,17 +4,16 @@ import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
-  // Use getSession (reads from cookie, no network call) for faster layout rendering
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!session) redirect('/login?redirect=/admin')
+  if (!user) redirect('/login?redirect=/admin')
 
   // Use admin client to bypass RLS for profile read (avoids policy infinite recursion)
   const admin = await createAdminClient()
   const { data: profile } = await admin
     .from('profiles')
     .select('*')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single()
 
   if (!profile) {

@@ -23,13 +23,13 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Read session from cookie — no network call, instant
-  const { data: { session } } = await supabase.auth.getSession()
+  // Use getUser() to properly validate session and refresh tokens
+  const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
 
   // Just check authentication here — role verification is done in the layouts
-  if ((pathname.startsWith('/admin') || pathname.startsWith('/surveyor')) && !session) {
+  if ((pathname.startsWith('/admin') || pathname.startsWith('/surveyor')) && !user) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
