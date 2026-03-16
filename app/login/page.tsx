@@ -35,6 +35,23 @@ function LoginForm() {
     setLoading(false)
   }
 
+  async function handleDemoLogin(demoEmail: string) {
+    setLoading(true)
+    setError('')
+    const supabase = createClient()
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: demoEmail,
+      password: 'demo1234',
+    })
+    if (authError) {
+      setError(authError.message)
+      setLoading(false)
+      return
+    }
+    if (data.user) router.push(redirect)
+    setLoading(false)
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Left panel */}
@@ -132,7 +149,45 @@ function LoginForm() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-8">
+          <div className="mt-6">
+            <div className="relative flex items-center gap-3 mb-4">
+              <div className="flex-1 h-px bg-slate-200" />
+              <span className="text-xs text-slate-400 font-medium">Quick Demo Access</span>
+              <div className="flex-1 h-px bg-slate-200" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('demo.admin@qgo.com')}
+                disabled={loading}
+                className="flex flex-col items-center gap-1 border border-slate-200 hover:border-blue-300 hover:bg-blue-50 rounded-lg px-3 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-semibold text-slate-700">Admin</span>
+                <span className="text-[10px] text-slate-400">demo.admin@qgo.com</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('demo.surveyor@qgo.com')}
+                disabled={loading}
+                className="flex flex-col items-center gap-1 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 rounded-lg px-3 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-semibold text-slate-700">Surveyor</span>
+                <span className="text-[10px] text-slate-400">demo.surveyor@qgo.com</span>
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-slate-500 mt-6">
             <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium">
               Back to homepage
             </Link>
