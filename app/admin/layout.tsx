@@ -9,7 +9,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect('/login?redirect=/admin')
 
   // Use admin client to bypass RLS for profile read (avoids policy infinite recursion)
-  const admin = await createAdminClient()
+  const admin = createAdminClient()
   const { data: profile } = await admin
     .from('profiles')
     .select('*')

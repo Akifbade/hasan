@@ -2,7 +2,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { formatCurrency } from '@/lib/utils'
 
 export default async function AnalyticsPage() {
-  const supabase = await createAdminClient()
+  const supabase = createAdminClient()
 
   const now = new Date()
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()

@@ -127,7 +127,7 @@ function MarkPaidButton({ invoiceId }: { invoiceId: string }) {
     <form action={async () => {
       'use server'
       const { createAdminClient } = await import('@/lib/supabase/server')
-      const admin = await createAdminClient()
+      const admin = createAdminClient()
       await admin.from('invoices').update({ payment_status: 'paid', paid_at: new Date().toISOString() }).eq('id', invoiceId)
     }}>
       <button type="submit" className="text-xs bg-green-50 text-green-700 hover:bg-green-100 px-2.5 py-1 rounded-lg font-medium transition-colors">

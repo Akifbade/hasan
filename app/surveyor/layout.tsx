@@ -8,7 +8,7 @@ export default async function SurveyorLayout({ children }: { children: React.Rea
 
   if (!user) redirect('/login?redirect=/surveyor')
 
-  const admin = await createAdminClient()
+  const admin = createAdminClient()
   const { data: profile } = await admin
     .from('profiles')
     .select('role, full_name')

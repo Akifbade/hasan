@@ -14,7 +14,7 @@ export default async function SurveyorChatPage({ params }: Props) {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) notFound()
 
-  const admin = await createAdminClient()
+  const admin = createAdminClient()
   const { data: profile } = await admin.from('profiles').select('*').eq('id', session.user.id).single()
   const { data: survey } = await admin
     .from('survey_requests')

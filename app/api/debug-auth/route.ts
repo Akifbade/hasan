@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   if (user) {
     try {
-      const admin = await createAdminClient()
+      const admin = createAdminClient()
       const { data, error } = await admin
         .from('profiles')
         .select('*')

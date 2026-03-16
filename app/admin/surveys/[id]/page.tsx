@@ -8,7 +8,7 @@ import SurveyLiveMap from '@/components/map/SurveyLiveMap'
 
 export default async function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createAdminClient()
+  const supabase = createAdminClient()
 
   const { data: survey } = await supabase
     .from('survey_requests')

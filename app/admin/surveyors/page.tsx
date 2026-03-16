@@ -3,7 +3,7 @@ import { formatDate } from '@/lib/utils'
 import AddSurveyorForm from './AddSurveyorForm'
 
 export default async function SurveyorsPage() {
-  const supabase = await createAdminClient()
+  const supabase = createAdminClient()
 
   const { data: surveyors } = await supabase
     .from('profiles')
@@ -137,7 +137,7 @@ function ToggleAvailabilityButton({ id, available }: { id: string; available: bo
     <form action={async () => {
       'use server'
       const { createAdminClient } = await import('@/lib/supabase/server')
-      const admin = await createAdminClient()
+      const admin = createAdminClient()
       await admin.from('profiles').update({ is_available: !available }).eq('id', id)
     }}>
       <button

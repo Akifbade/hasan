@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const admin = await createAdminClient()
+    const admin = createAdminClient()
 
     // Check agent
     let agentId = null

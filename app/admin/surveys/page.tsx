@@ -8,7 +8,7 @@ export default async function SurveysPage({
   searchParams: Promise<{ status?: string; search?: string }>
 }) {
   const params = await searchParams
-  const supabase = await createAdminClient()
+  const supabase = createAdminClient()
 
   let query = supabase
     .from('survey_requests')
