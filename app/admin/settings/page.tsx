@@ -7,8 +7,9 @@ interface PricingRoute {
   id: string
   origin_country: string
   destination_country: string
-  base_rate_per_cbm: number
-  lcl_min_cbm: number
+  lcl_rate_per_m3: number | null
+  container_20ft_price: number | null
+  container_40ft_price: number | null
   currency: string
 }
 
@@ -19,11 +20,9 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
 
-  const supabase = createClient()
-
   useEffect(() => {
-    supabase.from('pricing_routes').select('*').order('created_at').then(({ data }) => {
-      setRoutes(data || [])
+    fetch('/api/admin/pricing-routes').then(r => r.json()).then(data => {
+      setRoutes(Array.isArray(data) ? data : [])
       setLoading(false)
     })
   }, [])
@@ -31,20 +30,25 @@ export default function SettingsPage() {
   async function saveRoute(route: Partial<PricingRoute> & { id?: string }) {
     setSaving(true)
     setMsg('')
-    if (route.id) {
-      await supabase.from('pricing_routes').update(route).eq('id', route.id)
-    } else {
-      await supabase.from('pricing_routes').insert(route)
-    }
-    const { data } = await supabase.from('pricing_routes').select('*').order('created_at')
-    setRoutes(data || [])
+    const method = route.id ? 'PUT' : 'POST'
+    await fetch('/api/admin/pricing-routes', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(route),
+    })
+    const data = await fetch('/api/admin/pricing-routes').then(r => r.json())
+    setRoutes(Array.isArray(data) ? data : [])
     setSaving(false)
     setMsg('Saved!')
     setTimeout(() => setMsg(''), 2000)
   }
 
   async function deleteRoute(id: string) {
-    await supabase.from('pricing_routes').delete().eq('id', id)
+    await fetch('/api/admin/pricing-routes', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
     setRoutes(routes.filter(r => r.id !== id))
   }
 
@@ -97,8 +101,9 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
   const [form, setForm] = useState({
     origin_country: '',
     destination_country: '',
-    base_rate_per_cbm: 50,
-    lcl_min_cbm: 1,
+    lcl_rate_per_m3: 50,
+    container_20ft_price: 2000,
+    container_40ft_price: 3500,
     currency: 'USD',
   })
 
@@ -106,7 +111,7 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
     e.preventDefault()
     onSave(form)
     setShowForm(false)
-    setForm({ origin_country: '', destination_country: '', base_rate_per_cbm: 50, lcl_min_cbm: 1, currency: 'USD' })
+    setForm({ origin_country: '', destination_country: '', lcl_rate_per_m3: 50, container_20ft_price: 2000, container_40ft_price: 3500, currency: 'USD' })
   }
 
   if (loading) return <div className="text-center py-12 text-gray-400">Loading...</div>
@@ -114,7 +119,7 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-600">Define base rates per CBM for different shipping routes.</p>
+        <p className="text-sm text-gray-600">Define shipping rates for different routes.</p>
         <div className="flex items-center gap-3">
           {msg && <span className="text-green-600 text-sm font-medium">{msg}</span>}
           <button
@@ -151,13 +156,33 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Rate per CBM ($)</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">LCL Rate per m³</label>
               <input
                 type="number"
                 required
                 min={1}
-                value={form.base_rate_per_cbm}
-                onChange={e => setForm({ ...form, base_rate_per_cbm: Number(e.target.value) })}
+                value={form.lcl_rate_per_m3}
+                onChange={e => setForm({ ...form, lcl_rate_per_m3: Number(e.target.value) })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">20ft Container Price</label>
+              <input
+                type="number"
+                min={0}
+                value={form.container_20ft_price}
+                onChange={e => setForm({ ...form, container_20ft_price: Number(e.target.value) })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">40ft Container Price</label>
+              <input
+                type="number"
+                min={0}
+                value={form.container_40ft_price}
+                onChange={e => setForm({ ...form, container_40ft_price: Number(e.target.value) })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -179,7 +204,9 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
           </div>
           <div className="flex gap-3">
             <button type="button" onClick={() => setShowForm(false)} className="flex-1 border border-gray-300 text-sm py-2 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button type="submit" className="flex-1 bg-blue-600 text-white text-sm font-semibold py-2 rounded-lg hover:bg-blue-700">Save Route</button>
+            <button type="submit" disabled={saving} className="flex-1 bg-blue-600 text-white text-sm font-semibold py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+              {saving ? 'Saving...' : 'Save Route'}
+            </button>
           </div>
         </form>
       )}
@@ -189,7 +216,9 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
               <th className="px-6 py-3">Route</th>
-              <th className="px-6 py-3">Rate / CBM</th>
+              <th className="px-6 py-3">LCL / m³</th>
+              <th className="px-6 py-3">20ft</th>
+              <th className="px-6 py-3">40ft</th>
               <th className="px-6 py-3">Currency</th>
               <th className="px-6 py-3">Actions</th>
             </tr>
@@ -200,7 +229,9 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                   {r.origin_country} → {r.destination_country}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-700">{r.base_rate_per_cbm}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{r.lcl_rate_per_m3 ?? '—'}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{r.container_20ft_price ?? '—'}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{r.container_40ft_price ?? '—'}</td>
                 <td className="px-6 py-4 text-sm text-gray-700">{r.currency}</td>
                 <td className="px-6 py-4">
                   <button onClick={() => onDelete(r.id)} className="text-red-500 hover:text-red-700 text-xs font-medium">
@@ -211,7 +242,7 @@ function PricingTab({ routes, loading, saving, msg, onSave, onDelete }: {
             ))}
             {routes.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-gray-400 text-sm">
+                <td colSpan={6} className="px-6 py-12 text-center text-gray-400 text-sm">
                   No pricing routes configured yet.
                 </td>
               </tr>

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { formatDate, formatCurrency } from '@/lib/utils'
 
@@ -10,7 +10,7 @@ const PAYMENT_COLORS: Record<string, string> = {
 }
 
 export default async function InvoicesPage() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data: invoices } = await supabase
     .from('invoices')
