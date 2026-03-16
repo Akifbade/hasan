@@ -23,38 +23,16 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // Read session from cookie — no network call, instant
+  const { data: { session } } = await supabase.auth.getSession()
 
   const pathname = request.nextUrl.pathname
 
-  // Protect admin routes
-  if (pathname.startsWith('/admin')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/login?redirect=/admin', request.url))
-    }
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
-    }
-  }
-
-  // Protect surveyor routes
-  if (pathname.startsWith('/surveyor')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/login?redirect=/surveyor', request.url))
-    }
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    if (!profile || profile.role !== 'surveyor') {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
-    }
+  // Just check authentication here — role verification is done in the layouts
+  if ((pathname.startsWith('/admin') || pathname.startsWith('/surveyor')) && !session) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
   return supabaseResponse

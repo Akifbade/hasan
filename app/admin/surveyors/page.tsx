@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
 import AddSurveyorForm from './AddSurveyorForm'
 
 export default async function SurveyorsPage() {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
 
   const { data: surveyors } = await supabase
     .from('profiles')

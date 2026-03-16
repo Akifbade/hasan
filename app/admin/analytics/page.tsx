@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { formatCurrency } from '@/lib/utils'
 
 export default async function AnalyticsPage() {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
 
   const now = new Date()
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
@@ -72,7 +72,7 @@ export default async function AnalyticsPage() {
   const { data: assignments } = await supabase
     .from('survey_assignments')
     .select('surveyor_id, status')
-    .eq('status', 'completed')
+    .eq('status', 'completed' as string)
 
   const surveyorMap: Record<string, number> = {}
   for (const a of assignments || []) {

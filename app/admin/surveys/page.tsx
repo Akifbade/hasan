@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { STATUS_COLORS, STATUS_LABELS, formatDate } from '@/lib/utils'
 

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ChatInterface from '@/app/admin/surveys/[id]/chat/ChatInterface'
@@ -11,11 +11,12 @@ export default async function SurveyorChatPage({ params }: Props) {
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) notFound()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) notFound()
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-  const { data: survey } = await supabase
+  const admin = await createAdminClient()
+  const { data: profile } = await admin.from('profiles').select('*').eq('id', session.user.id).single()
+  const { data: survey } = await admin
     .from('survey_requests')
     .select('id, customer_name, customer_email, status, tracking_code')
     .eq('id', id)
@@ -23,7 +24,7 @@ export default async function SurveyorChatPage({ params }: Props) {
 
   if (!survey) notFound()
 
-  const { data: messages } = await supabase
+  const { data: messages } = await admin
     .from('chat_messages')
     .select('*')
     .eq('survey_request_id', id)
@@ -43,7 +44,7 @@ export default async function SurveyorChatPage({ params }: Props) {
         initialMessages={messages || []}
         senderName={profile?.full_name || 'Surveyor'}
         senderRole="surveyor"
-        senderId={user.id}
+        senderId={session.user.id}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { STATUS_COLORS, STATUS_LABELS, formatDate, formatVolume, CONTAINER_VOLUMES } from '@/lib/utils'
@@ -8,7 +8,7 @@ import SurveyLiveMap from '@/components/map/SurveyLiveMap'
 
 export default async function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
 
   const { data: survey } = await supabase
     .from('survey_requests')
