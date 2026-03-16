@@ -13,27 +13,29 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/admin'
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
+  async function doLogin(loginEmail: string, loginPassword: string) {
     setLoading(true)
     setError('')
 
-    const result = await loginAction(email, password, redirectTo)
-    if (result?.error) {
+    const result = await loginAction(loginEmail, loginPassword)
+    if ('error' in result) {
       setError(result.error)
       setLoading(false)
+      return
     }
+
+    // Hard reload so the browser sends newly-set cookies with the request
+    const dest = result.role === 'surveyor' ? '/surveyor' : redirectTo
+    window.location.href = dest
+  }
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault()
+    await doLogin(email, password)
   }
 
   async function handleDemoLogin(demoEmail: string) {
-    setLoading(true)
-    setError('')
-
-    const result = await loginAction(demoEmail, 'demo1234', redirectTo)
-    if (result?.error) {
-      setError(result.error)
-      setLoading(false)
-    }
+    await doLogin(demoEmail, 'demo1234')
   }
 
   return (
